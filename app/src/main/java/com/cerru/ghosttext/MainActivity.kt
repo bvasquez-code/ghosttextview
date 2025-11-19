@@ -219,9 +219,24 @@ private fun ChannelManagementScreen(
                     fontWeight = FontWeight.SemiBold
                 )
                 Button(onClick = {
-                    warningAccepted.value = true
+                    if (!warningAccepted.value) {
+                        Toast.makeText(
+                            context,
+                            "La contraseña es secreta. No viaja al servidor y no se puede recuperar si la olvidas. Debes recordarla siempre.",
+                            Toast.LENGTH_LONG
+                        ).show()
+                        warningAccepted.value = true
+                    }
                     scope.launch {
-                        val passwordId = ensurePasswordSelected(storage, passwordsState, selectedPasswordId, newPassword.value, confirmPassword.value, alias.value, context)
+                        val passwordId = ensurePasswordSelected(
+                            storage,
+                            passwordsState,
+                            selectedPasswordId,
+                            newPassword.value,
+                            confirmPassword.value,
+                            alias.value,
+                            context
+                        )
                         if (passwordId == null) return@launch
                         try {
                             val response = service.createChannel()
@@ -238,7 +253,7 @@ private fun ChannelManagementScreen(
                             infoMessage.value = "Error al crear canal: ${ex.message}"
                         }
                     }
-                }, enabled = warningAccepted.value, modifier = Modifier.fillMaxWidth()) {
+                }, modifier = Modifier.fillMaxWidth()) {
                     Text("Crear canal")
                 }
                 createChannelResult.value?.let { code ->
